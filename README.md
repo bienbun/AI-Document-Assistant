@@ -42,7 +42,3 @@ I am currently working on the document ingestion and retrieval pipeline and expa
 - Improve error handling
 - Add document management
 - Deploy the application
-
-## Author
-
-Thien Luu
