@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from pypdf import PdfReader
 from io import BytesIO
+from app.document import chunk_text
 
 app = FastAPI()
 
@@ -24,7 +25,12 @@ async def upload_pdf(file: UploadFile = File(...)):
         if page_text:
             text += page_text + "\n"
 
+    chunks = chunk_text(text)
+
     return {
         "filename": file.filename,
-        "text": text
+        "text": text,
+        "chunks": chunks,
+        "chunk_count": len(chunks)
     }
+
