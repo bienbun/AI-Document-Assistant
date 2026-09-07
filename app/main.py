@@ -2,8 +2,11 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from pypdf import PdfReader
 from io import BytesIO
 from app.document import chunk_text
+from app.retrieval import find_relevant_chunks
 
 app = FastAPI()
+
+document_chunks = []
 
 @app.get("/")
 def home():
@@ -27,6 +30,9 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     chunks = chunk_text(text)
 
+    global document_chunks
+    document_chunks = chunks
+
     return {
         "filename": file.filename,
         "text": text,
@@ -34,3 +40,11 @@ async def upload_pdf(file: UploadFile = File(...)):
         "chunk_count": len(chunks)
     }
 
+@app.get("/ask")
+def ask_question(question: str):
+    relevant_chunks = find_relevant_chunks(question, document_chunks)
+
+    return {
+        "question": question,
+        "relevant_chunks": relevant_chunks
+    }
