@@ -3,6 +3,7 @@ from pypdf import PdfReader
 from io import BytesIO
 from app.document import chunk_text
 from app.retrieval import find_relevant_chunks
+from app.llm import generate_answer
 
 app = FastAPI()
 
@@ -44,7 +45,18 @@ async def upload_pdf(file: UploadFile = File(...)):
 def ask_question(question: str):
     relevant_chunks = find_relevant_chunks(question, document_chunks)
 
+    if not relevant_chunks:
+        raise HTTPException(
+            status_code=404,
+            detail="No relevant information found in the document"
+        )
+
+    context = "\n\n".join(relevant_chunks)
+
+    answer = generate_answer(question, context)
+
     return {
         "question": question,
+        "answer": answer,
         "relevant_chunks": relevant_chunks
     }
