@@ -21,7 +21,7 @@ If the answer cannot be found in the context, say that you could not find it in 
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.6-flash",
         contents=prompt
     )
 
