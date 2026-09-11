@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from google import genai
+from google.genai import errors
 
 load_dotenv()
 
@@ -20,9 +21,13 @@ Question:
 If the answer cannot be found in the context, say that you could not find it in the document.
 """
 
-    response = client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=prompt
-    )
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents=prompt
+        )
 
-    return response.text
+        return response.text
+
+    except errors.ServerError:
+        return "The AI service is temporarily unavailable. Please try again."
