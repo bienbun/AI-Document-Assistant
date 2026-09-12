@@ -3,7 +3,7 @@ from pypdf import PdfReader
 from io import BytesIO
 from app.document import chunk_text
 from app.retrieval import find_relevant_chunks
-from app.llm import generate_answer
+from app.LLM import generate_answer
 
 app = FastAPI()
 
@@ -51,12 +51,23 @@ def ask_question(question: str):
             detail="No relevant information found in the document"
         )
 
-    context = "\n\n".join(relevant_chunks)
+    sources = [
+    {
+        "source_id": index + 1,
+        "text": chunk
+    }
+    for index, chunk in enumerate(relevant_chunks)
+    ]
+
+    context = "\n\n".join(
+        f"[Source {source['source_id']}]\n{source['text']}"
+        for source in sources
+    )
 
     answer = generate_answer(question, context)
 
     return {
         "question": question,
         "answer": answer,
-        "relevant_chunks": relevant_chunks
+        "sources": sources
     }
