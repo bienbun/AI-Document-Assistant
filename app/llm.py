@@ -1,16 +1,9 @@
-import os
-from dotenv import load_dotenv
-from google import genai
-from google.genai import errors
-
-load_dotenv()
-
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-
-
 def generate_answer(question: str, context: str) -> str:
     prompt = f"""
-You are answering questions using only the document context below.
+Answer the user's question using only the document context below.
+
+You may make reasonable inferences from the context, but do not use
+information that is not supported by the document.
 
 Context:
 {context}
@@ -18,7 +11,8 @@ Context:
 Question:
 {question}
 
-If the answer cannot be found in the context, say that you could not find it in the document.
+If the context does not contain enough information to answer the question,
+say that you could not find enough information in the document.
 """
 
     try:
