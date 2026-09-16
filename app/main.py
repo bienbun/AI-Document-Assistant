@@ -7,7 +7,7 @@ from app.LLM import generate_answer
 
 app = FastAPI()
 
-document_chunks = []
+documents = {}
 
 @app.get("/")
 def home():
@@ -31,8 +31,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     chunks = chunk_text(text)
 
-    global document_chunks
-    document_chunks = chunks
+    documents[file.filename] = chunks
 
     return {
         "filename": file.filename,
@@ -42,8 +41,17 @@ async def upload_pdf(file: UploadFile = File(...)):
     }
 
 @app.get("/ask")
-def ask_question(question: str):
-    relevant_chunks = find_relevant_chunks(question, document_chunks)
+def ask_question(filename: str, question: str):
+    if filename not in documents:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    relevant_chunks = find_relevant_chunks(
+        question,
+        documents[filename]
+    )
 
     if not relevant_chunks:
         raise HTTPException(
@@ -52,11 +60,11 @@ def ask_question(question: str):
         )
 
     sources = [
-    {
-        "source_id": index + 1,
-        "text": chunk
-    }
-    for index, chunk in enumerate(relevant_chunks)
+        {
+            "source_id": index + 1,
+            "text": chunk
+        }
+        for index, chunk in enumerate(relevant_chunks)
     ]
 
     context = "\n\n".join(
@@ -67,7 +75,8 @@ def ask_question(question: str):
     answer = generate_answer(question, context)
 
     return {
-        "question": question,
-        "answer": answer,
-        "sources": sources
+    "filename": filename,
+    "question": question,
+    "answer": answer,
+    "sources": sources
     }
