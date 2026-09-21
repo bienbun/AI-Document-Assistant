@@ -54,6 +54,33 @@ async def upload_pdf(file: UploadFile = File(...)):
     }
 
 
+@app.get("/documents")
+def list_documents():
+    return {
+        "documents": list(documents.keys()),
+        "count": len(documents)
+    }
+
+
+@app.delete("/documents/{filename}")
+def delete_document(filename: str):
+    if filename not in documents:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    del documents[filename]
+
+    # Update persistent storage after deletion
+    save_documents(documents)
+
+    return {
+        "message": "Document deleted successfully",
+        "filename": filename
+    }
+
+
 @app.get("/ask")
 def ask_question(filename: str, question: str):
     # Check that the requested document exists
