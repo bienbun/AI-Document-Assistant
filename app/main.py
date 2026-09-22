@@ -3,7 +3,10 @@ from pypdf import PdfReader
 from io import BytesIO
 
 from app.document import chunk_text
-from app.retrieval import find_relevant_chunks
+from app.retrieval import (
+    find_relevant_chunks,
+    create_chunk_embeddings
+)
 from app.LLM import generate_answer
 from app.storage import load_documents, save_documents
 
@@ -39,9 +42,13 @@ async def upload_pdf(file: UploadFile = File(...)):
             text += page_text + "\n"
 
     chunks = chunk_text(text)
+    chunk_embeddings = create_chunk_embeddings(chunks)
 
     # Save this document's chunks in memory
-    documents[file.filename] = chunks
+    documents[file.filename] = {
+    "chunks": chunks,
+    "embeddings": chunk_embeddings
+    }
 
     # Save all documents to persistent JSON storage
     save_documents(documents)
@@ -91,12 +98,16 @@ def ask_question(filename: str, question: str):
         )
 
     # Get chunks belonging to the selected document
-    document_chunks = documents[filename]
+    document = documents[filename]
+
+    document_chunks = document["chunks"]
+    chunk_embeddings = document["embeddings"]
 
     # Retrieve the most relevant chunks
     relevant_chunks = find_relevant_chunks(
         question,
-        document_chunks
+        document_chunks,
+        chunk_embeddings
     )
 
     if not relevant_chunks:

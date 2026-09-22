@@ -3,20 +3,27 @@ from app.embeddings import get_embedding
 
 
 def cosine_similarity(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+    return np.dot(a, b) / (
+        np.linalg.norm(a) * np.linalg.norm(b)
+    )
 
 
-def find_relevant_chunks(question, chunks):
+def create_chunk_embeddings(chunks):
+    return [
+        get_embedding(chunk).tolist()
+        for chunk in chunks
+    ]
+
+
+def find_relevant_chunks(question, chunks, chunk_embeddings):
     question_embedding = get_embedding(question)
 
     scored_chunks = []
 
-    for chunk in chunks:
-        chunk_embedding = get_embedding(chunk)
-
+    for chunk, chunk_embedding in zip(chunks, chunk_embeddings):
         score = cosine_similarity(
             question_embedding,
-            chunk_embedding
+            np.array(chunk_embedding)
         )
 
         scored_chunks.append((score, chunk))
