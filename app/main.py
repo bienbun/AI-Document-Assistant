@@ -97,11 +97,6 @@ def ask_question(filename: str, question: str):
             detail="Document not found"
         )
 
-    # Get chunks belonging to the selected document
-    document = documents[filename]
-
-    document_chunks = document["chunks"]
-    chunk_embeddings = document["embeddings"]
 
     # Retrieve the most relevant chunks
     relevant_chunks = find_relevant_chunks(
