@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from pypdf import PdfReader
 from io import BytesIO
 
-from app.document import chunk_text
+from app.document import chunk_text, clean_text
 from app.retrieval import (
     find_relevant_chunks,
     create_chunk_embeddings
@@ -40,6 +40,8 @@ async def upload_pdf(file: UploadFile = File(...)):
 
         if page_text:
             text += page_text + "\n"
+
+    text = clean_text(text)
 
     chunks = chunk_text(text)
     chunk_embeddings = create_chunk_embeddings(chunks)
