@@ -12,11 +12,17 @@ def generate_answer(question: str, context: str) -> str:
     prompt = f"""
     Answer the user's question using only the document context below.
 
-    You may make reasonable inferences from the context, but do not use
-    information that is not supported by the document.
+    Use direct evidence from the context when available.
+    You may also make reasonable interpretations or inferences when they are
+    strongly supported by the context.
+
+    Do not introduce facts that are not supported by the document.
 
     When you use information from a source, cite it using the source label
     exactly as written, for example [Source 1] or [Source 2].
+
+    If the answer is not stated explicitly but can be reasonably inferred,
+    explain that it is an interpretation and support it with the relevant sources.
 
     Context:
     {context}
@@ -24,8 +30,9 @@ def generate_answer(question: str, context: str) -> str:
     Question:
     {question}
 
-    If the context does not contain enough information to answer the question,
-    say that you could not find enough information in the document.
+    If the context truly does not contain enough evidence to answer or reasonably
+    infer an answer, say that you could not find enough information in the document.
+
     """
 
     try:
