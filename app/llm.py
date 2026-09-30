@@ -16,7 +16,7 @@ def generate_answer(question: str, context: str) -> str:
     You may also make reasonable interpretations or inferences when they are
     strongly supported by the context.
 
-    Do not introduce facts that are not supported by the document.
+    Do not introduce facts and outside sources that are not supported by the document.
 
     When you use information from a source, cite it using the source label
     exactly as written, for example [Source 1] or [Source 2].
