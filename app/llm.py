@@ -31,7 +31,7 @@ def generate_answer(question: str, context: str) -> str:
     {question}
 
     If the context truly does not contain enough evidence to answer or reasonably
-    infer an answer, say that you could not find enough information in the document.
+    Then you can just say that you could not find enough information in the document.
 
     """
 
