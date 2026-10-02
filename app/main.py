@@ -9,7 +9,7 @@ from app.retrieval import (
 )
 from app.LLM import generate_answer
 from app.storage import load_documents, save_documents
-
+from app.document import clean_text, chunk_pages
 
 app = FastAPI()
 
@@ -33,17 +33,17 @@ async def upload_pdf(file: UploadFile = File(...)):
     contents = await file.read()
     pdf = PdfReader(BytesIO(contents))
 
-    text = ""
+    pages = []
 
     for page in pdf.pages:
         page_text = page.extract_text()
 
         if page_text:
-            text += page_text + "\n"
+            pages.append(page_text)
+        else:
+            pages.append("")
 
-    text = clean_text(text)
-
-    chunks = chunk_text(text)
+    chunks = chunk_text(page)
     chunk_embeddings = create_chunk_embeddings(chunks)
 
     # Save this document's chunks in memory

@@ -20,3 +20,27 @@ def chunk_text(text, chunk_size=1000, overlap=200):
         start += chunk_size - overlap
 
     return chunks
+
+def chunk_pages(pages, chunk_size=1000, overlap=200):
+    chunks = []
+    chunk_id = 1
+
+    for page_number, page_text in enumerate(pages, start=1):
+        cleaned_text = clean_text(page_text)
+
+        page_chunks = chunk_text(
+            cleaned_text,
+            chunk_size,
+            overlap
+        )
+
+        for chunk in page_chunks:
+            chunks.append({
+                "chunk_id": chunk_id,
+                "page": page_number,
+                "text": chunk
+            })
+
+            chunk_id += 1
+
+    return chunks
