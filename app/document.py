@@ -21,6 +21,7 @@ def chunk_text(text, chunk_size=1000, overlap=200):
 
     return chunks
 
+
 def chunk_pages(pages, chunk_size=1000, overlap=200):
     chunks = []
     chunk_id = 1

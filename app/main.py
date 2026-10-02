@@ -2,14 +2,13 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from pypdf import PdfReader
 from io import BytesIO
 
-from app.document import chunk_text, clean_text
 from app.retrieval import (
     find_relevant_chunks,
     create_chunk_embeddings
 )
 from app.LLM import generate_answer
 from app.storage import load_documents, save_documents
-from app.document import clean_text, chunk_pages
+from app.document import chunk_pages
 
 app = FastAPI()
 
@@ -43,8 +42,13 @@ async def upload_pdf(file: UploadFile = File(...)):
         else:
             pages.append("")
 
-    chunks = chunk_text(page)
-    chunk_embeddings = create_chunk_embeddings(chunks)
+    chunks = chunk_pages(pages)
+
+    chunk_texts = [
+        chunk["text"]
+        for chunk in chunks
+    ]
+    chunk_embeddings = create_chunk_embeddings(chunk_texts)
 
     # Save this document's chunks in memory
     documents[file.filename] = {
@@ -57,7 +61,6 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     return {
         "filename": file.filename,
-        "text": text,
         "chunks": chunks,
         "chunk_count": len(chunks)
     }
@@ -122,14 +125,17 @@ def ask_question(filename: str, question: str):
     sources = [
         {
             "source_id": index + 1,
-            "text": chunk
+            "chunk_id": chunk["chunk_id"],
+            "page": chunk["page"],
+            "text": chunk["text"]
         }
         for index, chunk in enumerate(relevant_chunks)
     ]
 
     # Build context for Gemini with source labels
     context = "\n\n".join(
-        f"[Source {source['source_id']}]\n{source['text']}"
+        f"[Source {source['source_id']} | Page {source['page']} | Chunk {source['chunk_id']}]\n"
+        f"{source['text']}"
         for source in sources
     )
 
