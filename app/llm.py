@@ -18,8 +18,9 @@ def generate_answer(question: str, context: str) -> str:
 
     Do not introduce facts and outside sources that are not supported by the document.
 
-    When you use information from a source, cite it using the source label
-    exactly as written, for example [Source 1] or [Source 2].
+    When you use information from a source, cite the full source label
+    exactly as written, for example:
+    [Source 1 | Page 3 | Chunk 7]
 
     If the answer is not stated explicitly but can be reasonably inferred,
     explain that it is an interpretation and support it with the relevant sources.
@@ -31,7 +32,7 @@ def generate_answer(question: str, context: str) -> str:
     {question}
 
     If the context truly does not contain enough evidence to answer or reasonably
-    Then you can just say that you could not find enough information in the document.
+    infer an answer, say that you could not find enough information in the document.
 
     """
 
