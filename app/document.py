@@ -13,11 +13,17 @@ def chunk_text(text, chunk_size=1000, overlap=200):
     start = 0
 
     while start < len(text):
-        end = start + chunk_size
+        end = min(start + chunk_size, len(text))
+
         chunk = text[start:end]
         chunks.append(chunk)
 
+        # Stop if this chunk already reached the end of the text
+        if end == len(text):
+            break
+
         start += chunk_size - overlap
+
 
     return chunks
 
