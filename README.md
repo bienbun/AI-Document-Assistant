@@ -32,6 +32,7 @@ The goal of this project is to allow users to upload documents and ask questions
 Currently in development.
 
 I am currently working on the document ingestion and retrieval pipeline and expanding the system to provide more accurate context-aware answers.
+I have been improving the chunking and LLM prompt so that the answers are more acurrate and has supporting sources.
 
 ## Future Improvements
 
